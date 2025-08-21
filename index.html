@@ -1,173 +1,206 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Decodificador ASCII para Lua</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decodificador ASCII para Lua</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>Decodificador ASCII para Lua</h1>
-      <p class="subtitle">Converta códigos ASCII para scripts Lua de forma precisa</p>
-    </header>
-    <div class="main-content">
-      <div class="config-panel">
-        <div class="panel-title"><i class="fas fa-cog"></i><span>Configurações</span></div>
-        <div class="option-group">
-          <div class="option-title">Opções de Decodificação:</div>
-          <div class="options">
-            <div class="option"><input type="checkbox" id="strict-mode" checked><label for="strict-mode">Modo Estrito (0-127)</label></div>
-            <div class="option"><input type="checkbox" id="auto-scroll" checked><label for="auto-scroll">Auto Rolagem</label></div>
-          </div>
+    <div class="container">
+        <header>
+            <h1>Decodificador ASCII para Lua</h1>
+            <p class="subtitle">Converta códigos ASCII para scripts Lua de forma precisa</p>
+        </header>
+
+        <div class="main-content">
+            <div class="panel config-panel">
+                <h2><i class="fas fa-cog"></i> Configurações</h2>
+
+                <div class="form-group">
+                    <label>Opções de Decodificação:</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="strict-mode" checked>
+                            <label for="strict-mode">Modo Estrito (0-127)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="auto-scroll" checked>
+                            <label for="auto-scroll">Auto Rolagem</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="ascii-input">Entrada ASCII:</label>
+                    <textarea class="form-control" id="ascii-input" placeholder="Cole seus códigos ASCII aqui (ex: 109\98\111\116\95\70\79\86\95\82\97\100\105\117\115)"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <div class="cf-turnstile" data-sitekey="SEU_SITE_KEY_AQUI"></div>
+                </div>
+
+                <div class="buttons">
+                    <button class="btn btn-primary" id="decode-btn"><i class="fas fa-play"></i> Decodificar</button>
+                    <button class="btn btn-success" id="example-btn"><i class="fas fa-lightbulb"></i> Exemplo</button>
+                    <button class="btn btn-danger" id="clear-btn"><i class="fas fa-trash"></i> Limpar</button>
+                </div>
+            </div>
+
+            <div class="panel result-panel">
+                <h2><i class="fas fa-file-code"></i> Resultado</h2>
+
+                <div class="output-container">
+                    <pre id="result">O script decodificado aparecerá aqui...</pre>
+                </div>
+
+                <div class="output-stats">
+                    <div id="char-count">0 caracteres</div>
+                    <div id="line-count">0 linhas</div>
+                </div>
+
+                <div class="buttons">
+                    <button class="btn btn-primary" id="copy-btn"><i class="fas fa-copy"></i> Copiar</button>
+                </div>
+
+                <div class="form-group download-section">
+                    <label>Salvar como Arquivo Lua:</label>
+                    <div class="range-container download-input">
+                        <input type="text" id="filename" value="script" placeholder="Nome do arquivo">
+                        <span>.lua</span>
+                    </div>
+                    <button class="btn btn-success" id="download-btn"><i class="fas fa-download"></i> Baixar Arquivo</button>
+                </div>
+            </div>
         </div>
-        <div class="option-group">
-          <div class="option-title">Entrada ASCII:</div>
-          <textarea id="ascii-input" placeholder="Cole seus códigos ASCII aqui (ex: 109\98\111\116\95\70\79\86\95\82\97\100\105\117\115)"></textarea>
-        </div>
-        <div class="button-group">
-          <button class="btn-primary" id="decode-btn"><i class="fas fa-play"></i>Decodificar</button>
-          <button class="btn-secondary" id="example-btn"><i class="fas fa-lightbulb"></i>Exemplo</button>
-          <button class="btn-accent" id="clear-btn"><i class="fas fa-trash"></i>Limpar</button>
-        </div>
-      </div>
-      <div class="result-panel">
-        <div class="panel-title"><i class="fas fa-file-code"></i><span>Resultado</span></div>
-        <div class="result-container" id="decoded-result">O script decodificado aparecerá aqui...</div>
-        <div class="stats"><div id="char-count">0 caracteres</div><div id="line-count">0 linhas</div></div>
-        <div class="button-group">
-          <button class="btn-primary" id="copy-btn"><i class="fas fa-copy"></i>Copiar</button>
-        </div>
-        <div class="download-section">
-          <div class="option-title">Salvar como Arquivo Lua:</div>
-          <div class="download-input"><input type="text" id="filename" value="script" placeholder="Nome do arquivo"><span>.lua</span></div>
-          <button class="btn-secondary" id="download-btn"><i class="fas fa-download"></i>Baixar Arquivo</button>
-        </div>
-      </div>
+
+        <footer>
+            <p>Decodificador ASCII para Lua &copy; 2023 - Todos os direitos reservados</p>
+        </footer>
     </div>
-    <footer><p>Decodificador ASCII para Lua &copy; 2023 - Todos os direitos reservados</p></footer>
-  </div>
-  <div class="notification" id="notification"><i class="fas fa-check-circle"></i><span id="notification-text">Operação realizada com sucesso!</span></div>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const asciiInput = document.getElementById('ascii-input');
-      const decodeBtn = document.getElementById('decode-btn');
-      const clearBtn = document.getElementById('clear-btn');
-      const exampleBtn = document.getElementById('example-btn');
-      const copyBtn = document.getElementById('copy-btn');
-      const downloadBtn = document.getElementById('download-btn');
-      const decodedResult = document.getElementById('decoded-result');
-      const charCount = document.getElementById('char-count');
-      const lineCount = document.getElementById('line-count');
-      const filenameInput = document.getElementById('filename');
-      const strictMode = document.getElementById('strict-mode');
-      const autoScroll = document.getElementById('auto-scroll');
-      const exampleCode = "108\111\99\97\108\32\110\117\109\98\101\114\10\102\111\114\32\105\32\61\32\49\44\32\49\48\32\100\111\32\100\111\10\9\110\117\109\98\101\114\32\61\32\110\117\109\98\101\114\32\43\32\49\10\9\112\114\105\110\116\40\34\78\117\109\98\101\114\58\32\34\32\46\46\32\110\117\109\98\101\114\41\10\101\110\100";
-      exampleBtn.addEventListener('click', function() {
-        asciiInput.value = exampleCode;
-        decodeASCII();
-        showNotification("Exemplo carregado com sucesso!");
-      });
-      decodeBtn.addEventListener('click', decodeASCII);
-      asciiInput.addEventListener('keydown', function(e) {
-        if (e.ctrlKey && e.key === 'Enter') decodeASCII();
-      });
-      clearBtn.addEventListener('click', function() {
-        asciiInput.value = '';
-        decodedResult.textContent = 'O script decodificado aparecerá aqui...';
-        updateStats(0, 0);
-        showNotification("Campos limpos com sucesso!");
-      });
-      copyBtn.addEventListener('click', function() {
-        const textToCopy = decodedResult.textContent;
-        if (textToCopy && textToCopy !== 'O script decodificado aparecerá aqui...') {
-          navigator.clipboard.writeText(textToCopy).then(function() {
-            showNotification("Texto copiado para a área de transferência!");
-          }).catch(function() {
-            showNotification("Falha ao copiar o texto.", true);
-          });
-        } else {
-          showNotification("Nenhum texto para copiar.", true);
-        }
-      });
-      downloadBtn.addEventListener('click', function() {
-        const textToDownload = decodedResult.textContent;
-        if (textToDownload && textToDownload !== 'O script decodificado aparecerá aqui...') {
-          const filename = filenameInput.value.trim() || 'script';
-          downloadFile(textToDownload, filename + '.lua', 'text/plain');
-          showNotification("Arquivo baixado com sucesso!");
-        } else {
-          showNotification("Nenhum texto para baixar.", true);
-        }
-      });
-      function decodeASCII() {
-        const input = asciiInput.value.trim();
-        if (!input) {
-          showNotification("Por favor, insira algum código ASCII.", true);
-          return;
-        }
-        try {
-          let asciiArray;
-          if (input.includes('\\')) asciiArray = input.split('\\').filter(item => item !== '');
-          else asciiArray = input.split(/[\s,]+/).filter(item => item !== '');
-          let result = '';
-          let errors = [];
-          for (let i = 0; i < asciiArray.length; i++) {
-            const code = asciiArray[i];
-            if (!/^\d+$/.test(code)) {
-              errors.push(`"${code}" não é um número válido`);
-              continue;
+
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notification-text">Operação realizada com sucesso!</span>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const asciiInput = document.getElementById('ascii-input');
+            const decodeBtn = document.getElementById('decode-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const exampleBtn = document.getElementById('example-btn');
+            const copyBtn = document.getElementById('copy-btn');
+            const downloadBtn = document.getElementById('download-btn');
+            const resultOutput = document.getElementById('result');
+            const charCount = document.getElementById('char-count');
+            const lineCount = document.getElementById('line-count');
+            const filenameInput = document.getElementById('filename');
+            const strictMode = document.getElementById('strict-mode');
+            const autoScroll = document.getElementById('auto-scroll');
+
+            const exampleCode = "108\\111\\99\\97\\108\\32\\110\\117\\109\\98\\101\\114\\10\\102\\111\\114\\32\\105\\32\\61\\32\\49\\44\\32\\49\\48\\32\\100\\111\\32\\100\\111\\10\\9\\110\\117\\109\\98\\101\\114\\32\\61\\32\\110\\117\\109\\98\\101\\114\\32\\43\\32\\49\\10\\9\\112\\114\\105\\110\\116\\40\\34\\78\\117\\109\\98\\101\\114\\58\\32\\34\\32\\46\\46\\32\\110\\117\\109\\98\\101\\114\\41\\10\\101\\110\\100";
+
+            exampleBtn.addEventListener('click', function() {
+                asciiInput.value = exampleCode;
+                decodeASCII();
+                showNotification("Exemplo carregado com sucesso!");
+            });
+
+            decodeBtn.addEventListener('click', decodeASCII);
+            asciiInput.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.key === 'Enter') decodeASCII();
+            });
+
+            clearBtn.addEventListener('click', function() {
+                asciiInput.value = '';
+                resultOutput.textContent = 'O script decodificado aparecerá aqui...';
+                updateStats(0, 0);
+                showNotification("Campos limpos com sucesso!");
+            });
+
+            copyBtn.addEventListener('click', function() {
+                const textToCopy = resultOutput.textContent;
+                if (textToCopy && textToCopy !== 'O script decodificado aparecerá aqui...') {
+                    navigator.clipboard.writeText(textToCopy).then(() => showNotification("Texto copiado para a área de transferência!"))
+                    .catch(() => showNotification("Falha ao copiar o texto.", true));
+                } else {
+                    showNotification("Nenhum texto para copiar.", true);
+                }
+            });
+
+            downloadBtn.addEventListener('click', function() {
+                const textToDownload = resultOutput.textContent;
+                if (textToDownload && textToDownload !== 'O script decodificado aparecerá aqui...') {
+                    const token = turnstile.getResponse();
+                    if (!token) {
+                        showNotification("Por favor, complete o desafio de verificação.", true);
+                        return;
+                    }
+                    const filename = filenameInput.value.trim() || 'script';
+                    downloadFile(textToDownload, filename + '.lua', 'text/plain');
+                    turnstile.reset();
+                    showNotification("Arquivo baixado com sucesso!");
+                } else {
+                    showNotification("Nenhum texto para baixar.", true);
+                }
+            });
+
+            function decodeASCII() {
+                const token = turnstile.getResponse();
+                if (!token) {
+                    showNotification("Por favor, complete o desafio de verificação.", true);
+                    return;
+                }
+                const input = asciiInput.value.trim();
+                if (!input) { showNotification("Por favor, insira algum código ASCII.", true); return; }
+                try {
+                    let asciiArray = input.includes('\\') ? input.split('\\').filter(item => item !== '') : input.split(/[\s,]+/).filter(item => item !== '');
+                    let result = '';
+                    let errors = [];
+                    for (let code of asciiArray) {
+                        if (!/^\d+$/.test(code)) { errors.push(`"${code}" não é um número válido`); continue; }
+                        const num = parseInt(code, 10);
+                        if (strictMode.checked && (num < 0 || num > 255)) { errors.push(`Código ${num} fora do intervalo ASCII (0-255)`); continue; }
+                        result += String.fromCharCode(num);
+                    }
+                    resultOutput.textContent = result;
+                    updateStats(result.length, result.split('\n').length);
+                    if (autoScroll.checked) resultOutput.scrollTop = resultOutput.scrollHeight;
+                    if (errors.length > 0) showNotification(`Decodificado com ${errors.length} erro(s). Verifique o modo estrito.`, true);
+                    else showNotification("Texto decodificado com sucesso!");
+                    turnstile.reset();
+                } catch (error) {
+                    showNotification("Erro durante a decodificação: " + error.message, true);
+                }
             }
-            const num = parseInt(code, 10);
-            if (strictMode.checked && (num < 0 || num > 255)) {
-              errors.push(`Código ${num} está fora do intervalo ASCII válido (0-255)`);
-              continue;
+
+            function updateStats(chars, lines) {
+                charCount.textContent = `${chars} caracteres`;
+                lineCount.textContent = `${lines} linhas`;
             }
-            result += String.fromCharCode(num);
-          }
-          decodedResult.textContent = result;
-          const lines = result.split('\n').length;
-          updateStats(result.length, lines);
-          if (autoScroll.checked) decodedResult.scrollTop = decodedResult.scrollHeight;
-          if (errors.length > 0) showNotification(`Decodificado com ${errors.length} erro(s). Verifique o modo estrito.`, true);
-          else showNotification("Texto decodificado com sucesso!");
-        } catch (error) {
-          showNotification("Erro durante a decodificação: " + error.message, true);
-        }
-      }
-      function updateStats(chars, lines) {
-        charCount.textContent = `${chars} caracteres`;
-        lineCount.textContent = `${lines} linhas`;
-      }
-      function showNotification(message, isError = false) {
-        const notification = document.getElementById('notification');
-        const notificationText = document.getElementById('notification-text');
-        notificationText.textContent = message;
-        if (isError) {
-          notification.classList.add('error');
-          notification.querySelector('i').className = 'fas fa-exclamation-circle';
-        } else {
-          notification.classList.remove('error');
-          notification.querySelector('i').className = 'fas fa-check-circle';
-        }
-        notification.classList.add('show');
-        setTimeout(() => {
-          notification.classList.remove('show');
-        }, 3000);
-      }
-      function downloadFile(content, fileName, contentType) {
-        const a = document.createElement('a');
-        const file = new Blob([content], { type: contentType });
-        a.href = URL.createObjectURL(file);
-        a.download = fileName;
-        a.click();
-        URL.revokeObjectURL(a.href);
-      }
-    });
-  </script>
+
+            function showNotification(message, isError = false) {
+                const notification = document.getElementById('notification');
+                const notificationText = document.getElementById('notification-text');
+                notificationText.textContent = message;
+                notification.classList.toggle('error', isError);
+                notification.querySelector('i').className = isError ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+                notification.classList.add('show');
+                setTimeout(() => notification.classList.remove('show'), 3000);
+            }
+
+            function downloadFile(content, fileName, contentType) {
+                const a = document.createElement('a');
+                const file = new Blob([content], { type: contentType });
+                a.href = URL.createObjectURL(file);
+                a.download = fileName;
+                a.click();
+                URL.revokeObjectURL(a.href);
+            }
+        });
+    </script>
 </body>
 </html>
