@@ -4,15 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Decodificador ASCII para Lua</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
         <header>
             <h1>Decodificador ASCII para Lua</h1>
-            <p class="subtitle">Converta códigos ASCII para scripts Lua de forma precisa</p>
+            <p>Converta códigos ASCII em scripts Lua de forma rápida e precisa</p>
         </header>
 
         <div class="main-content">
@@ -20,71 +19,50 @@
                 <h2><i class="fas fa-cog"></i> Configurações</h2>
 
                 <div class="form-group">
-                    <label>Opções de Decodificação:</label>
-                    <div class="checkbox-group">
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="strict-mode" checked>
-                            <label for="strict-mode">Modo Estrito (0-127)</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="auto-scroll" checked>
-                            <label for="auto-scroll">Auto Rolagem</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
                     <label for="ascii-input">Entrada ASCII:</label>
-                    <textarea class="form-control" id="ascii-input" placeholder="Cole seus códigos ASCII aqui (ex: 109\98\111\116\95\70\79\86\95\82\97\100\105\117\115)"></textarea>
+                    <textarea id="ascii-input" class="form-control" placeholder="Ex: 109\98\111\116\95\70\79\86\95\82\97\100\105\117\115"></textarea>
                 </div>
 
                 <div class="form-group">
-                    <div class="cf-turnstile" data-sitekey="SEU_SITE_KEY_AQUI"></div>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="strict-mode" checked>
+                        Modo Estrito (0-127)
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="auto-scroll" checked>
+                        Auto Rolagem
+                    </label>
                 </div>
 
                 <div class="buttons">
-                    <button class="btn btn-primary" id="decode-btn"><i class="fas fa-play"></i> Decodificar</button>
-                    <button class="btn btn-success" id="example-btn"><i class="fas fa-lightbulb"></i> Exemplo</button>
-                    <button class="btn btn-danger" id="clear-btn"><i class="fas fa-trash"></i> Limpar</button>
+                    <button id="decode-btn" class="btn btn-primary"><i class="fas fa-play"></i> Decodificar</button>
+                    <button id="example-btn" class="btn btn-success"><i class="fas fa-lightbulb"></i> Exemplo</button>
+                    <button id="clear-btn" class="btn btn-danger"><i class="fas fa-trash"></i> Limpar</button>
                 </div>
             </div>
 
-            <div class="panel result-panel">
+            <div class="panel output-container">
                 <h2><i class="fas fa-file-code"></i> Resultado</h2>
-
-                <div class="output-container">
-                    <pre id="result">O script decodificado aparecerá aqui...</pre>
-                </div>
+                <textarea id="result" readonly></textarea>
 
                 <div class="output-stats">
-                    <div id="char-count">0 caracteres</div>
-                    <div id="line-count">0 linhas</div>
+                    <div>Caracteres: <span id="char-count">0</span></div>
+                    <div>Linhas: <span id="line-count">0</span></div>
                 </div>
 
                 <div class="buttons">
-                    <button class="btn btn-primary" id="copy-btn"><i class="fas fa-copy"></i> Copiar</button>
-                </div>
-
-                <div class="form-group download-section">
-                    <label>Salvar como Arquivo Lua:</label>
-                    <div class="range-container download-input">
-                        <input type="text" id="filename" value="script" placeholder="Nome do arquivo">
-                        <span>.lua</span>
-                    </div>
-                    <button class="btn btn-success" id="download-btn"><i class="fas fa-download"></i> Baixar Arquivo</button>
+                    <button id="copy-btn" class="btn btn-success"><i class="fas fa-copy"></i> Copiar</button>
+                    <button id="download-btn" class="btn btn-danger"><i class="fas fa-download"></i> Baixar Arquivo</button>
                 </div>
             </div>
         </div>
 
         <footer>
-            <p>Decodificador ASCII para Lua &copy; 2023 - Todos os direitos reservados</p>
+            <p>Decodificador ASCII para Lua &copy; 2025 - Todos os direitos reservados</p>
         </footer>
     </div>
 
-    <div class="notification" id="notification">
-        <i class="fas fa-check-circle"></i>
-        <span id="notification-text">Operação realizada com sucesso!</span>
-    </div>
+    <div class="notification" id="notification">Operação realizada com sucesso!</div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -97,7 +75,6 @@
             const resultOutput = document.getElementById('result');
             const charCount = document.getElementById('char-count');
             const lineCount = document.getElementById('line-count');
-            const filenameInput = document.getElementById('filename');
             const strictMode = document.getElementById('strict-mode');
             const autoScroll = document.getElementById('auto-scroll');
 
@@ -110,95 +87,66 @@
             });
 
             decodeBtn.addEventListener('click', decodeASCII);
-            asciiInput.addEventListener('keydown', function(e) {
-                if (e.ctrlKey && e.key === 'Enter') decodeASCII();
-            });
-
-            clearBtn.addEventListener('click', function() {
+            clearBtn.addEventListener('click', () => {
                 asciiInput.value = '';
-                resultOutput.textContent = 'O script decodificado aparecerá aqui...';
-                updateStats(0, 0);
+                resultOutput.value = '';
+                charCount.textContent = '0';
+                lineCount.textContent = '0';
                 showNotification("Campos limpos com sucesso!");
             });
 
-            copyBtn.addEventListener('click', function() {
-                const textToCopy = resultOutput.textContent;
-                if (textToCopy && textToCopy !== 'O script decodificado aparecerá aqui...') {
-                    navigator.clipboard.writeText(textToCopy).then(() => showNotification("Texto copiado para a área de transferência!"))
-                    .catch(() => showNotification("Falha ao copiar o texto.", true));
-                } else {
-                    showNotification("Nenhum texto para copiar.", true);
+            copyBtn.addEventListener('click', () => {
+                if(resultOutput.value.trim() === '') {
+                    showNotification("Nada para copiar!", true);
+                    return;
                 }
+                navigator.clipboard.writeText(resultOutput.value).then(() => showNotification("Texto copiado!"));
             });
 
-            downloadBtn.addEventListener('click', function() {
-                const textToDownload = resultOutput.textContent;
-                if (textToDownload && textToDownload !== 'O script decodificado aparecerá aqui...') {
-                    const token = turnstile.getResponse();
-                    if (!token) {
-                        showNotification("Por favor, complete o desafio de verificação.", true);
-                        return;
-                    }
-                    const filename = filenameInput.value.trim() || 'script';
-                    downloadFile(textToDownload, filename + '.lua', 'text/plain');
-                    turnstile.reset();
-                    showNotification("Arquivo baixado com sucesso!");
-                } else {
-                    showNotification("Nenhum texto para baixar.", true);
+            downloadBtn.addEventListener('click', () => {
+                if(resultOutput.value.trim() === '') {
+                    showNotification("Nada para baixar!", true);
+                    return;
                 }
+                const blob = new Blob([resultOutput.value], { type: 'text/plain' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'script.lua';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
             });
 
             function decodeASCII() {
-                const token = turnstile.getResponse();
-                if (!token) {
-                    showNotification("Por favor, complete o desafio de verificação.", true);
-                    return;
-                }
                 const input = asciiInput.value.trim();
                 if (!input) { showNotification("Por favor, insira algum código ASCII.", true); return; }
-                try {
-                    let asciiArray = input.includes('\\') ? input.split('\\').filter(item => item !== '') : input.split(/[\s,]+/).filter(item => item !== '');
-                    let result = '';
-                    let errors = [];
-                    for (let code of asciiArray) {
-                        if (!/^\d+$/.test(code)) { errors.push(`"${code}" não é um número válido`); continue; }
-                        const num = parseInt(code, 10);
-                        if (strictMode.checked && (num < 0 || num > 255)) { errors.push(`Código ${num} fora do intervalo ASCII (0-255)`); continue; }
-                        result += String.fromCharCode(num);
-                    }
-                    resultOutput.textContent = result;
-                    updateStats(result.length, result.split('\n').length);
-                    if (autoScroll.checked) resultOutput.scrollTop = resultOutput.scrollHeight;
-                    if (errors.length > 0) showNotification(`Decodificado com ${errors.length} erro(s). Verifique o modo estrito.`, true);
-                    else showNotification("Texto decodificado com sucesso!");
-                    turnstile.reset();
-                } catch (error) {
-                    showNotification("Erro durante a decodificação: " + error.message, true);
-                }
-            }
 
-            function updateStats(chars, lines) {
-                charCount.textContent = `${chars} caracteres`;
-                lineCount.textContent = `${lines} linhas`;
+                let codes = input.includes('\\') ? input.split('\\').filter(c => c !== '') : input.split(/[\s,]+/).filter(c => c !== '');
+                let result = '';
+                let errors = [];
+
+                for(let code of codes) {
+                    if(!/^\d+$/.test(code)) { errors.push(`"${code}" não é válido`); continue; }
+                    const num = parseInt(code, 10);
+                    if(strictMode.checked && (num < 0 || num > 127)) { errors.push(`Código ${num} fora do intervalo ASCII`); continue; }
+                    result += String.fromCharCode(num);
+                }
+
+                resultOutput.value = result;
+                charCount.textContent = result.length;
+                lineCount.textContent = result.split('\n').length;
+
+                if(autoScroll.checked) resultOutput.scrollTop = resultOutput.scrollHeight;
+
+                showNotification(errors.length > 0 ? `Decodificado com ${errors.length} erro(s)` : "Decodificação concluída!");
             }
 
             function showNotification(message, isError = false) {
                 const notification = document.getElementById('notification');
-                const notificationText = document.getElementById('notification-text');
-                notificationText.textContent = message;
-                notification.classList.toggle('error', isError);
-                notification.querySelector('i').className = isError ? 'fas fa-exclamation-circle' : 'fas fa-check-circle';
+                notification.textContent = message;
+                notification.className = 'notification' + (isError ? ' error' : '');
                 notification.classList.add('show');
                 setTimeout(() => notification.classList.remove('show'), 3000);
-            }
-
-            function downloadFile(content, fileName, contentType) {
-                const a = document.createElement('a');
-                const file = new Blob([content], { type: contentType });
-                a.href = URL.createObjectURL(file);
-                a.download = fileName;
-                a.click();
-                URL.revokeObjectURL(a.href);
             }
         });
     </script>
